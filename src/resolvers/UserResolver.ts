@@ -1,7 +1,7 @@
-import { Arg, Field, InputType, Mutation, Resolver } from "type-graphql";
+import { Arg, Field, InputType, Mutation, Resolver, Query } from "type-graphql";
 import { getRepository } from "typeorm";
 
-import UserModel from "../model/User";
+import User from "../model/User";
 
 @InputType()
 class UserCreateInput {
@@ -17,18 +17,22 @@ class UserCreateInput {
 
 @Resolver()
 export class UserResolver {
-  @Mutation(() => UserModel)
+  @Mutation(() => User)
   async createUser(
     @Arg("dados", () => UserCreateInput)
     dados: UserCreateInput
   ) {
 
-    const repository = getRepository(UserModel);
+    const repository = getRepository(User);
     const result = await repository.insert({ ...dados });
 
-    return {
-      id: result.raw,
-      ...dados
-    };
+    return { ...dados, id: result.raw };
+  }
+
+  @Query(() => [User])
+  async usuarios() {
+    const repository = getRepository(User);
+    const usuarios = await repository.find();
+    return usuarios;
   }
 }
