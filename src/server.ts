@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import dotenv from "dotenv";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
@@ -8,6 +9,10 @@ import "./database/connect";
 import { AccountResolver } from "./resolvers/AccountResolver";
 import { UserResolver } from "./resolvers/UserResolver";
 
+import { authChecker } from "./model/Auth";
+
+dotenv.config();
+
 (async () => {
   const app = express();
 
@@ -16,7 +21,8 @@ import { UserResolver } from "./resolvers/UserResolver";
       resolvers: [
         AccountResolver, 
         UserResolver
-      ]
+      ],
+      authChecker 
     }),
     context: ({ req, res }) => ({ req, res })
   });

@@ -1,7 +1,9 @@
-import { Arg, Field, InputType, Mutation, Resolver, Query } from "type-graphql";
+import { Arg, Field, InputType, Mutation, Resolver, Query, Authorized, Ctx } from "type-graphql";
 import { getRepository } from "typeorm";
 
 import User from "../model/User";
+import { Context } from "../types/context";
+import { getPayload } from "../model/Auth";
 
 @InputType()
 class UserCreateInput {
@@ -29,8 +31,13 @@ export class UserResolver {
     return { ...dados, id: result.raw };
   }
 
+  @Authorized("ADMIN")
   @Query(() => [User])
-  async usuarios() {
+  async usuarios(@Ctx() ctx: Context) {
+    const payload = getPayload(ctx);
+
+    console.log(payload)
+
     const repository = getRepository(User);
     const usuarios = await repository.find();
     return usuarios;
